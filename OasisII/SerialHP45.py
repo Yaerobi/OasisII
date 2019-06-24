@@ -155,7 +155,7 @@ class HP45(serial.Serial):
                     temp_return_string = B64.B64FromSingle(read_line)
                     self.inkjet_temperature = float(temp_return_string)
                     self.inkjet_temperature /= 10.0 #get whole degrees
-                    logging.debug('Getting temperature: %f', % (self.inkjet_temperature))
+                    logging.debug('Getting temperature: %f' % (self.inkjet_temperature))
                 if (read_line.startswith('GEP:')):
                     #print("getting position")
                     read_line = read_line.partition(':') #split at :
@@ -165,14 +165,14 @@ class HP45(serial.Serial):
                     #print("position found: " + str(temp_return_string))
                     self.inkjet_x_pos = float(temp_return_string)
                     self.inkjet_x_pos /= 1000.0 #get millimeters
-                    logging.debug('Getting position: %f', % (self.inkjet_x_pos))
+                    logging.debug('Getting position: %f' % (self.inkjet_x_pos))
                 if (read_line.startswith('BWL:')):
                     #print("getting buffer write left")
                     read_line = read_line.partition(':') #split at :
                     read_line = read_line[2] #get end
                     temp_return_string = B64.B64FromSingle(read_line)
                     self.inkjet_writeleft = int(temp_return_string)
-                    logging.debug('Getting Buffer write left: %f', % (self.inkjet_writeleft))
+                    logging.debug('Getting Buffer write left: %f' % (self.inkjet_writeleft))
                 if (read_line.startswith('THD:')): 
                     #print("decoding test results")
                     read_line = read_line.partition(':') #split at :
