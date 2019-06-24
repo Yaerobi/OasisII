@@ -506,11 +506,9 @@ class MainWindow(QtWidgets.QMainWindow):
             print("Printing Page number %d" % num_page)
             self.PrintArray()
                 
-            # TODO: Agregar aquí la señal para el cambio de hojas
         print("Finish PDF printing")
         self.pdfconverter.remove_working_dir()
-         #check if connected before sending
-            
+
     def PrintArray(self):
         """Prints the current converted image array, only works if both inkjet and motion are connected"""
         #y is sweep direction, x is gantry direction
@@ -688,7 +686,7 @@ class MainWindow(QtWidgets.QMainWindow):
             while(True):
                 if (self.inkjet_lines_left > 0):
                     self.inkjet.SerialWriteBufferRaw(self.inkjet_line_buffer[0])
-                    time.sleep(0.001) #this is a good replacement for print, but takes forever
+                    # time.sleep(0.001) #this is a good replacement for print, but takes forever
                     print(str(self.inkjet_line_buffer[0])) #some sort of delay is required, else the function gets filled up too quickly. Will move to different buffer later
                     del self.inkjet_line_buffer[0] #remove sent line
                     self.inkjet_lines_left -= 1

@@ -34,6 +34,12 @@ import serial
 import threading
 import time
 import B64
+import logging
+
+
+logging.basicConfig(format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
+                    filename='OasisII.log', level=logging.DEBUG)
+
 
 class HP45(serial.Serial):
     def __init__(self):
@@ -69,6 +75,8 @@ class HP45(serial.Serial):
         """Attempt to connect to the HP45 controller"""
         self.com_port_raw = str(serial_port) #get value from set_com
         self.ser.port = self.com_port_raw #set com port
+
+        logging.info("I am connecting")
         
         if (self.connection_state == 0): #if not yet connected
             #print("attempting to open: " + self.com_port_raw)
@@ -91,6 +99,7 @@ class HP45(serial.Serial):
                 self.update_thread.start()
                 self.status_thread = threading.Thread(target=self.GetStatus)
                 self.status_thread.start()
+                logging.info("Connection successfully")
                 return 1
             else:
                 return 0
@@ -101,6 +110,7 @@ class HP45(serial.Serial):
             self._stop_event.set()
             self.ser.close()
             print("Closing grbl connection")
+            logging.info("Disconected")
             self.connection_state = 0
             return 0
             
@@ -116,6 +126,7 @@ class HP45(serial.Serial):
                     temp_read = self.ser.read(self.ser.in_waiting) #add serial to read buffer
                     temp_read = str(temp_read.decode('utf-8'))
                     temp_success = 1
+                    logging.debug('Read: %r' % temp_read)
             except:
                 print("Read error") #some mistake, otherwise ignore quietly
                 break
@@ -132,9 +143,11 @@ class HP45(serial.Serial):
                 read_line = read_line.rstrip() #remove carriage return
                 #print("reading line: " + str(read_line)) 
                 #check purpose of response
+                logging.debug(read_line)
                 if (read_line.startswith('OK')): #if ok was found,
                     self.ok_state = 1 #set ok state to 1
                     #print("OK found, setting ok state")
+                    logging.debug("Ok found, setting ok state")
                 if (read_line.startswith('GTP:')):
                     #print("getting temperature")
                     read_line = read_line.partition(':') #split at :
@@ -142,6 +155,7 @@ class HP45(serial.Serial):
                     temp_return_string = B64.B64FromSingle(read_line)
                     self.inkjet_temperature = float(temp_return_string)
                     self.inkjet_temperature /= 10.0 #get whole degrees
+                    logging.debug('Getting temperature: %f', % (self.inkjet_temperature))
                 if (read_line.startswith('GEP:')):
                     #print("getting position")
                     read_line = read_line.partition(':') #split at :
@@ -151,13 +165,14 @@ class HP45(serial.Serial):
                     #print("position found: " + str(temp_return_string))
                     self.inkjet_x_pos = float(temp_return_string)
                     self.inkjet_x_pos /= 1000.0 #get millimeters
+                    logging.debug('Getting position: %f', % (self.inkjet_x_pos))
                 if (read_line.startswith('BWL:')):
                     #print("getting buffer write left")
                     read_line = read_line.partition(':') #split at :
                     read_line = read_line[2] #get end
                     temp_return_string = B64.B64FromSingle(read_line)
                     self.inkjet_writeleft = int(temp_return_string)
-                    
+                    logging.debug('Getting Buffer write left: %f', % (self.inkjet_writeleft))
                 if (read_line.startswith('THD:')): 
                     #print("decoding test results")
                     read_line = read_line.partition(':') #split at :
@@ -183,6 +198,8 @@ class HP45(serial.Serial):
                     self.send_get_status = 0 #set get status to 0
                     #print("Getting status")
                 elif (self.BufferLeft() > 0): #if there are lines left to print
+                    logging.debug("There are lines to print")
+                    logging.debug("inkjet_writeleft is: %r" % (self.inkjet_writeleft))
                     if (self.inkjet_writeleft > 50): #only send if space left in hp45 buffer
                         #print(self.BufferLeft())
                         self.ok_state = 0 #set ok state to 0
