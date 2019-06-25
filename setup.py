@@ -10,7 +10,7 @@ setup(
         author='Ivo de Haas',
         maintainer='Emmanuel Arias',
         maintainer_email='eamanu@eamanu.com',
-        packages=['Oasis'],
-        ext_modules=cythonize(["./Oasis/ImageConverter.pyx", "./Oasis/SerialHP45.py"], annotate=False),
+        packages=['OasisII'],
+        ext_modules=cythonize(["./OasisII/ImageConverter.pyx"], annotate=False),
         include_dirs=[numpy.get_include()]
 )
