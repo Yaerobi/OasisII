@@ -25,7 +25,7 @@ import sys
 from PyQt5.QtCore import Qt
 from PyQt5.QtWidgets import (QWidget, QLabel, QLineEdit, QTextEdit,
     QTextEdit, QGridLayout, QApplication, QPushButton, QDesktopWidget,
-    QSlider, QComboBox)
+    QSlider, QComboBox, QRadioButton)
 from PyQt5.QtGui import QIcon, QPixmap, QFont
 
 
@@ -156,7 +156,13 @@ class Interface(QWidget):
         #create combobox dropdown
         self.dpi_combo = QComboBox()
         self.dpi_combo.addItems(["600","300","200","150"])
-        
+
+        # Left Rigth side page 
+        self.right_side_radio = QRadioButton("RightSide")
+        self.right_side_radio.setChecked(True)
+
+        self.left_side_radio = QRadioButton("LeftSide")
+        self.left_side_radio.setChecked(False)
         
         #fix to grid  
         grid.addWidget(self.input_window,0,0,12,12) 
@@ -240,7 +246,9 @@ class Interface(QWidget):
         grid.addWidget(self.dpi_combo, 17,12,1,2)
         grid.addWidget(self.dpi_title, 17,14,1,2)
         
-        
+        grid.addWidget(self.right_side_radio, 18, 12, 1 ,2)
+        grid.addWidget(self.left_side_radio, 18, 14, 1, 2)
+
         #set tooltips
         self.motion_connect.setToolTip("The COM port the GRBL is on. 'COM#' for Windows, '/dev/ttyUSB#' for Linux") 
         self.inkjet_connect.setToolTip("The COM port the HP45 is on. 'COM#' for Windows, '/dev/ttyUSB#' for Linux") 

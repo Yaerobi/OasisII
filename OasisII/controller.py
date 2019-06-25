@@ -117,6 +117,14 @@ class MainWindow(QtWidgets.QMainWindow):
         self.ready_for_print = list()
         self.flag_finish_pages = False
 
+        self.print_right_side = 1
+
+        self.right_y_start = 200.0
+        self.right_x_start = 80.0
+
+        self.left_y_start = 200.0
+        self.left_x_start = 80.0
+
 
     def GrblConnect(self):
         """Gets the GRBL serial port and attempt to connect to it"""
@@ -563,8 +571,15 @@ class MainWindow(QtWidgets.QMainWindow):
         #determine pixel to position multiplier (in millimeters)
         self.pixel_to_pos_multiplier = 25.4 / self.imageconverter.GetDPI()
         #determine x and y start position (in millimeters)
-        self.y_start_pos = 200.0
-        self.x_start_pos = 80.0
+        if self.print_right_side == 1:
+            # XXX: Lado derecho
+            self.y_start_pos = self.right_y_start
+            self.x_start_pos = self.right_x_start
+        else:
+            # XXX: Lado Izquierdo
+            self.y_start_pos = self.left_y_start
+            self.x_start_pos = self.left_x_start
+
         self.y_acceleration_distance = 22.0
 
         self.sweep_x_min_pos = self.sweep_x_min
