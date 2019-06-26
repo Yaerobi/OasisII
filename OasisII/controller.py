@@ -436,6 +436,13 @@ class MainWindow(QtWidgets.QMainWindow):
 
     def RunPrintArray(self):
         """Starts a thread for the print array function"""
+        if self.ui.right_side_radio.isChecked():
+            self.print_right_side = 1
+            print("I will start for the right side")
+        else:
+            print("I will start for the left side")
+            self.print_left_side = -1
+
         if (self.file_loaded == 1):
             self._printing_stop_event = threading.Event()
             self.printing_thread = threading.Thread(target=self.PrintArray)
@@ -724,6 +731,7 @@ class MainWindow(QtWidgets.QMainWindow):
             self.sweep_x_min_pos += self.sweep_size
         
         print("Printing done")
+        self.print_right_side *= -1
 
 
 if __name__ == '__main__':
