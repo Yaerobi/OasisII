@@ -143,7 +143,7 @@ class HP45(serial.Serial):
                 read_line = read_line.rstrip() #remove carriage return
                 #print("reading line: " + str(read_line)) 
                 #check purpose of response
-                logging.debug(read_line)
+                logging.debug("Read line complete: %r " % read_line)
                 if (read_line.startswith('OK')): #if ok was found,
                     self.ok_state = 1 #set ok state to 1
                     #print("OK found, setting ok state")
