@@ -119,11 +119,11 @@ class MainWindow(QtWidgets.QMainWindow):
 
         self.print_right_side = 1
 
-        self.right_y_start = 200.0
-        self.right_x_start = 80.0
+        self.right_y_start = 275.0
+        self.right_x_start = 70.0
 
-        self.left_y_start = 200.0
-        self.left_x_start = 80.0
+        self.left_y_start = 55.0
+        self.left_x_start = 70.0
 
 
     def GrblConnect(self):
@@ -589,7 +589,7 @@ class MainWindow(QtWidgets.QMainWindow):
             self.y_start_pos = self.left_y_start
             self.x_start_pos = self.left_x_start
 
-        self.y_acceleration_distance = 22.0
+        self.y_acceleration_distance = 10.0
 
         self.sweep_x_min_pos = self.sweep_x_min
         ###loop through all sweeps
@@ -707,14 +707,19 @@ class MainWindow(QtWidgets.QMainWindow):
             print("Filling inkjet buffer")
             #start filling the inkjet buffer on the HP45 lines
             temp_lines_sent = 0
+            count_lines = 0
             while(True):
                 if (self.inkjet_lines_left > 0):
                     self.inkjet.SerialWriteBufferRaw(self.inkjet_line_buffer[0])
+                    if count_lines > 900:
+                        time.sleep(0.001)
+                        count_lines = 0
                     # time.sleep(0.001) #this is a good replacement for print, but takes forever
                     print(str(self.inkjet_line_buffer[0])) #some sort of delay is required, else the function gets filled up too quickly. Will move to different buffer later
                     del self.inkjet_line_buffer[0] #remove sent line
                     self.inkjet_lines_left -= 1
                     temp_lines_sent += 1
+                    count_lines += 1
                 else:
                     break
 
@@ -734,6 +739,7 @@ class MainWindow(QtWidgets.QMainWindow):
         
         print("Printing done")
         self.print_right_side *= -1
+        self.grbl.SerialGotoXY(5, 410, '20000')
 
 
 if __name__ == '__main__':
