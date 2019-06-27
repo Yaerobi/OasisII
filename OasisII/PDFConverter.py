@@ -49,13 +49,11 @@ def convert_png(fname: str, output_dir: str, dpi: int) -> None:
                            stderr=subprocess.STDOUT)
     stdout, stderr = out.communicate()
 
-"""
 try:
     from pdf2image  import convert_from_path
     convert_png = convert_png2
 except ImportError:
     pass
-"""
 
 class PDFConverter:
     def __init__(self):

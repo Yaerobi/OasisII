@@ -351,7 +351,7 @@ class MainWindow(QtWidgets.QMainWindow):
         0 if failed
         """
         list_for_files = glob.glob(os.path.join(
-            self.pdfconverter.working_dir, '*.png'))
+            self.pdfconverter.working_dir, '*.jpg'))
         list_for_files.sort()
 
         if len(list_for_files) != self.pdfconverter.number_of_pages:
@@ -449,7 +449,7 @@ class MainWindow(QtWidgets.QMainWindow):
             self.printing_thread.start()
         if (self.file_loaded == 3):
             self._printing_stop_event = threading.Event()
-            self.printing_thread = threading.Thread(target=self.PrintPDF)
+            self.printing_thread = threading.Thread(target=self.IronPrintPDF)
             self.printing_thread.start()
             self.printing_thread.join()
 
@@ -532,7 +532,7 @@ class MainWindow(QtWidgets.QMainWindow):
 
         #check if printhead and motion are connected
         if (self.grbl_connection_state == 0): #do not continue if motion is not connected
-            print("estoy en print array")
+            print("GRBL not CONNECTED")
             return
         #inkjet is ignored for now
 
