@@ -447,6 +447,7 @@ class MainWindow(QtWidgets.QMainWindow):
             self._printing_stop_event = threading.Event()
             self.printing_thread = threading.Thread(target=self.PrintArray)
             self.printing_thread.start()
+            self.printing_thread.join()
         if (self.file_loaded == 3):
             self._printing_stop_event = threading.Event()
             self.printing_thread = threading.Thread(target=self.PrintPDF)
