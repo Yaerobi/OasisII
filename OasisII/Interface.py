@@ -163,6 +163,12 @@ class Interface(QWidget):
 
         self.left_side_radio = QRadioButton("LeftSide")
         self.left_side_radio.setChecked(False)
+
+        # Y left and right line edit
+        self.y_left_start_line = QLineEdit(self)
+        self.y_left_label = QLabel("Y Left", self)
+        self.y_right_start_line = QLineEdit(self)
+        self.y_right_label = QLabel("X Right", self)
         
         #fix to grid  
         grid.addWidget(self.input_window,0,0,12,12) 
@@ -183,7 +189,16 @@ class Interface(QWidget):
         grid.addWidget(self.inkjet_write_line,20,24,2,8) 
         grid.addWidget(self.inkjet_send_line,20,32,2,4)
         grid.addWidget(self.inkjet_serial_input,22,24,4,12)
-        
+
+        # Y left and rigth
+
+        grid.addWidget(self.y_left_start_line, 26, 24, 1, 6)
+        grid.addWidget(self.y_left_label, 26, 30, 1, 6)
+       
+        grid.addWidget(self.y_right_start_line, 28, 24, 1, 6)
+        grid.addWidget(self.y_right_label, 28, 30, 1, 6)
+
+
         grid.addWidget(self.motion_function_title,12,0,1,12)
         grid.addWidget(self.motion_home,14,0,1,2)
         grid.addWidget(self.motion_spreader,14,4,1,2)
@@ -259,7 +274,8 @@ class Interface(QWidget):
         self.inkjet_preheat.setToolTip("Send a burst of short pulses to the printhead, heating up the printhead without ejecting (much) ink")
         self.inkjet_prime.setToolTip("Send a burst of long pulses to the printhead, ejecting with each nozzle")
         
-        
+        self.y_left_start_line.setToolTip("Left Y start")
+        self.y_right_start_line.setToolTip("Right Y start")
         #slider update
         self.threshold_slider.valueChanged.connect(self.UpdateThresholdSliderValue) 
         
