@@ -445,6 +445,14 @@ class MainWindow(QtWidgets.QMainWindow):
             print("I will start for the left side")
             self.print_left_side = -1
 
+        y_left = self.ui.y_left_start_line.text()
+        y_right = self.ui.y_right_start_line.text()
+
+        if y_left != "":
+            self.left_y_start = float(y_left)
+        if y_right != "":
+            self.right_y_start = float(y_right)
+
         if (self.file_loaded == 1):
             self._printing_stop_event = threading.Event()
             self.printing_thread = threading.Thread(target=self.PrintArray)
@@ -714,18 +722,17 @@ class MainWindow(QtWidgets.QMainWindow):
             while(True):
                 if (self.inkjet_lines_left > 0):
                     self.inkjet.SerialWriteBufferRaw(self.inkjet_line_buffer[0])
-                    if count_lines > 900:
-                        time.sleep(0.001)
-                        count_lines = 0
-                    # time.sleep(0.001) #this is a good replacement for print, but takes forever
+                    # if count_lines > 900:
+                    #     time.sleep(0.001)
+                    #     count_lines = 0
+                    time.sleep(0.001) #this is a good replacement for print, but takes forever
                     print(str(self.inkjet_line_buffer[0])) #some sort of delay is required, else the function gets filled up too quickly. Will move to different buffer later
                     del self.inkjet_line_buffer[0] #remove sent line
                     self.inkjet_lines_left -= 1
                     temp_lines_sent += 1
-                    count_lines += 1
+                    # count_lines += 1
                 else:
                     break
-
 
             #send motion lines
             print("Filling motion buffer")
