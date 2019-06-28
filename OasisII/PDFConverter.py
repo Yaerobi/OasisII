@@ -68,8 +68,9 @@ class PDFConverter:
         self.pdf_content = list()
         self.working_dir = os.path.join(FILE_PATH, 'temp')
 
-        if not os.access(self.working_dir, os.W_OK):
-            os.chmod(self.working_dir, stat.S_IWUSR)
+        if sys.platform == 'win32':
+            if not os.access(self.working_dir, os.W_OK):
+                os.chmod(self.working_dir, stat.S_IWUSR)
 
         if os.path.exists(self.working_dir):
             shutil.rmtree(self.working_dir)
