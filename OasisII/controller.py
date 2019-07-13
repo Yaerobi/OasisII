@@ -76,7 +76,7 @@ class MainWindow(QtWidgets.QMainWindow):
         self.ui.motion_xn.clicked.connect(lambda: self.grbl.Jog('X', '-10', '9000'))
         self.ui.motion_yp.clicked.connect(lambda: self.grbl.Jog('Y', '10', '9000'))
         self.ui.motion_yn.clicked.connect(lambda: self.grbl.Jog('Y', '-10', '9000'))
-        self.ui.motion_goto_home.clicked.connect(lambda: self.grbl.SerialGotoXY(5, 410, '20000')) #I am lazy, this should be automatically generated
+        self.ui.motion_goto_home.clicked.connect(lambda: self.grbl.SerialGotoXY(5, 433, '20000')) #I am lazy, this should be automatically generated
         self.ui.motion_fu.clicked.connect(lambda: self.grbl.Jog('A', '-1', '150'))
         self.ui.motion_fd.clicked.connect(lambda: self.grbl.Jog('A', '1', '150'))
         self.ui.motion_bu.clicked.connect(lambda: self.grbl.Jog('Z', '-1', '800'))
@@ -121,11 +121,11 @@ class MainWindow(QtWidgets.QMainWindow):
 
         self.print_right_side = 1
 
-        self.right_y_start = 275.0
-        self.right_x_start = 70.0
+        self.right_y_start = 225.0
+        self.right_x_start = 90.0
 
-        self.left_y_start = 55.0
-        self.left_x_start = 70.0
+        self.left_y_start = 12.0
+        self.left_x_start = 90.0
 
 
     def GrblConnect(self):
@@ -552,8 +552,8 @@ class MainWindow(QtWidgets.QMainWindow):
         self.inkjet_line_buffer = [] #buffer storing the print lines
         self.inkjet_lines_left = 0 #the number of lines in buffer
         self.inkjet_line_history = "" #the last burst line sent to buffer
-        self.travel_speed = 20000.0
-        self.print_speed = 9000.0
+        self.travel_speed = 12000.0
+        self.print_speed = 8000.0
 
         self.inkjet.ClearBuffer() #clear inkjet buffer on HP45
 
@@ -600,7 +600,7 @@ class MainWindow(QtWidgets.QMainWindow):
             self.y_start_pos = self.left_y_start
             self.x_start_pos = self.left_x_start
 
-        self.y_acceleration_distance = 10.0
+        self.y_acceleration_distance = 5.0
 
         self.sweep_x_min_pos = self.sweep_x_min
         ###loop through all sweeps
@@ -749,7 +749,7 @@ class MainWindow(QtWidgets.QMainWindow):
         
         print("Printing done")
         self.print_right_side *= -1
-        self.grbl.SerialGotoXY(5, 410, '20000')
+        self.grbl.SerialGotoXY(5, 433, '20000')
 
 
 if __name__ == '__main__':

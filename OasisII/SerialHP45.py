@@ -44,7 +44,6 @@ logging.basicConfig(format='%(asctime)s - %(name)s - %(levelname)s - %(message)s
 class HP45(serial.Serial):
     def __init__(self):
         self.ser = serial.Serial() #make an instance of serial connection
-        self.ser.baudrate = 250000 #set baudrate
         self.ser.timeout = 0 #set timeout to 0, non blocking mode
         
         #status flags
@@ -62,7 +61,7 @@ class HP45(serial.Serial):
         self.inkjet_working_nozzles = 0 #the total amount working of nozzles
         self.inkjet_temperature = 0.0 #the temperature of the printhead
         self.inkjet_writeleft = 0 #the amount of read lines left
-        self.inkjet_dpi = 300 #the DPI of the printhead
+        self.inkjet_dpi = 600 #the DPI of the printhead
         self.inkjet_density = 190 #the density of the printhead
         
         self.code_buffer = []

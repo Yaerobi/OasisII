@@ -70,14 +70,14 @@ class Interface(QWidget):
         self.motion_xn = QPushButton('X-', self)
         self.motion_yp = QPushButton('Y+', self)
         self.motion_yn = QPushButton('Y-', self)
-        self.motion_fu = QPushButton('Feed up', self)
-        self.motion_fd = QPushButton('Feed down', self)
+        self.motion_fu = QPushButton('-', self)
+        self.motion_fd = QPushButton('-', self)
         self.motion_bu = QPushButton('Z+', self)
         self.motion_bd = QPushButton('Z-', self)
-        self.motion_spreader = QPushButton('Spreader on', self)
-        self.motion_new_layer = QPushButton('New layer', self)
-        self.motion_prime_layer = QPushButton('Prime layer', self)
-        self.inkjet_set_pos = QPushButton('Set Position', self)
+        self.motion_spreader = QPushButton('-', self)
+        self.motion_new_layer = QPushButton('-', self)
+        self.motion_prime_layer = QPushButton('-', self)
+        self.inkjet_set_pos = QPushButton('Setear Posición', self)
         self.inkjet_preheat = QPushButton('Precalentar', self)
         self.inkjet_prime = QPushButton('Prime', self)
         #self.inkjet_set_dpi = QPushButton('Set DPI', self)
@@ -87,8 +87,8 @@ class Interface(QWidget):
         self.file_convert_button = QPushButton('Convertir', self)
         #self.save_png = QPushButton('Save PNG', self)
         self.file_print_button = QPushButton('Imprimir', self)
-        self.pause_button = QPushButton('Pausar', self)
-        self.abort_button = QPushButton('Abortar', self)
+        self.pause_button = QPushButton('-', self)
+        self.abort_button = QPushButton('-', self)
         
 
         
@@ -157,7 +157,7 @@ class Interface(QWidget):
         self.dpi_combo = QComboBox()
         self.dpi_combo.addItems(["600","300","200","150"])
 
-        # Left Rigth side page 
+        # Left Right side page 
         self.right_side_radio = QRadioButton("RightSide")
         self.right_side_radio.setChecked(True)
 
@@ -168,7 +168,7 @@ class Interface(QWidget):
         self.y_left_start_line = QLineEdit(self)
         self.y_left_label = QLabel("Y Left", self)
         self.y_right_start_line = QLineEdit(self)
-        self.y_right_label = QLabel("X Right", self)
+        self.y_right_label = QLabel("Y Right", self)
         
         #fix to grid  
         grid.addWidget(self.input_window,0,0,12,12) 
@@ -190,7 +190,7 @@ class Interface(QWidget):
         grid.addWidget(self.inkjet_send_line,20,32,2,4)
         grid.addWidget(self.inkjet_serial_input,22,24,4,12)
 
-        # Y left and rigth
+        # Y left and right
 
         grid.addWidget(self.y_left_start_line, 26, 24, 1, 6)
         grid.addWidget(self.y_left_label, 26, 30, 1, 6)

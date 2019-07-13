@@ -54,8 +54,8 @@ class GRBL(serial.Serial):
         self.motion_z_pos = 0.0
         self.motion_a_pos = 0.0
         
-        self.printer_size_x = 388.0 #x total size
-        self.printer_size_y = 422.0 #y total size
+        self.printer_size_x = 353.0 #x total size
+        self.printer_size_y = 425.0 #y total size
         self.printer_size_f = 100.0 #feed hopper total size
         self.printer_size_b = 100.0 #build hopper total size
         
@@ -63,7 +63,7 @@ class GRBL(serial.Serial):
         
         self.nl_back_pos_x = 15.0 #where x starts feeding
         self.nl_back_pos_y = 15.0 #where y starts and ends while feeding
-        self.nl_front_pos_x = 388.0 #where x ends
+        self.nl_front_pos_x = 355.0 #where x ends
         self.nl_travel_speed = 20000.0 #how fast new layer travels
         self.nl_feed_speed = 1000.0 #how fast new layer feeds (default 3000)
         self.nl_piston_speed = 1000.0 #how fast the pistons move

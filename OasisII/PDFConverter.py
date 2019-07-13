@@ -67,7 +67,7 @@ class PDFConverter:
         self.file_name = ''
         self.pdf_content = list()
         self.working_dir = os.path.join(FILE_PATH, 'temp')
-
+        """
         if sys.platform == 'win32':
             if not os.access(self.working_dir, os.W_OK):
                 os.chmod(self.working_dir, stat.S_IWUSR)
@@ -76,7 +76,7 @@ class PDFConverter:
             shutil.rmtree(self.working_dir)
 
         os.mkdir(self.working_dir)
-
+        """
         self.list_pages_name = list()
         self.number_of_pages = 0
 
