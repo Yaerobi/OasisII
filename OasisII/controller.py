@@ -127,6 +127,9 @@ class MainWindow(QtWidgets.QMainWindow):
         self.left_y_start = 12.0
         self.left_x_start = 90.0
 
+        self.start_new_file = threading.Event()
+        self.change_page = threading.Event()
+
 
     def GrblConnect(self):
         """Gets the GRBL serial port and attempt to connect to it"""
@@ -391,6 +394,7 @@ class MainWindow(QtWidgets.QMainWindow):
             if not self.open_png_pages_pdf():
                 print('Error on the open of PDF file')
             print("Processing finished. Ready to print :-)")
+            self.start_new_file.set()
 
 
     def PausePrint(self):
@@ -457,25 +461,28 @@ class MainWindow(QtWidgets.QMainWindow):
             self._printing_stop_event = threading.Event()
             self.printing_thread = threading.Thread(target=self.PrintArray)
             self.printing_thread.start()
-            self.printing_thread.join()
-        if (self.file_loaded == 3):
+            # self.printing_thread.join()
+        if (self.file_loaded == 3 and self.start_new_file.is_set()):
             self._printing_stop_event = threading.Event()
             self.printing_thread = threading.Thread(target=self.PrintPDF)
             self.printing_thread.start()
-            self.printing_thread.join()
+            self.start_new_file.clear()
+            # self.printing_thread.join()
+        else:
+            self.change_page.set()
 
     def IronPrintPDF(self) -> None:
         """Manager of Processing and printers Thread
         """
         tr = threading.Thread(target=self.thread_renderizer)
         tp = threading.Thread(target=self.thread_printer)
-        
+
         tr.start()
         tp.start()
 
-        tr.join()
-        tp.join()
-        
+        # tr.join()
+        # tp.join()
+
         print("Finish PDF printing")
         self.pdfconverter.remove_working_dir()
 
@@ -504,7 +511,7 @@ class MainWindow(QtWidgets.QMainWindow):
         while True:
             if self.flag_finish_pages and not len(self.ready_for_print):
                 print("Finished to print")
-                self.flag_finish_pages = False 
+                self.flag_finish_pages = False
                 return 0
             if not len(self.ready_for_print) and not self.flag_finish_pages:
                 print("Nothing to print I will sleep")
@@ -526,12 +533,19 @@ class MainWindow(QtWidgets.QMainWindow):
         number_pages = len(self.pdflistpng)
         print("PDF file has %d pages" % number_pages)
         for page, num_page in zip(self.pdflistpng, range(1, number_pages + 1)):
+            self.change_page.clear()
             self.imageconverter = page
             print("Processing Page number %d" % num_page)
             self.RenderOutput()
             print("Printing Page number %d" % num_page)
             self.PrintArray()
-                
+            if num_page == number_pages:
+                break
+            print("Finished page %d and press Imprimir to continue" % num_page)
+            self.change_page.wait()
+
+        self.start_new_file.set()
+
         print("Finish PDF printing")
         self.pdfconverter.remove_working_dir()
 
@@ -605,6 +619,7 @@ class MainWindow(QtWidgets.QMainWindow):
         self.sweep_x_min_pos = self.sweep_x_min
         ###loop through all sweeps
         temp_sweep_stop = 0
+        self.printing_direction = 1 #only 1 for now
         while (temp_sweep_stop == 0):
             #determine if there still is a sweep left
             #determine X-start and X end of sweep
@@ -642,7 +657,6 @@ class MainWindow(QtWidgets.QMainWindow):
             print("sweep Y min: " + str(self.sweep_y_min) +", Y max: " + str(self.sweep_y_max))
 
             #determine printing direction (if necessary)
-            self.printing_direction = 1 #only 1 for now
 
             #Set Y at starting and end position
             if (self.printing_direction == 1):
@@ -652,12 +666,20 @@ class MainWindow(QtWidgets.QMainWindow):
                 self.y_printing_end_pos += self.y_start_pos + self.y_acceleration_distance
                 print("Sweep ranges from: " + str(self.y_printing_start_pos) + "mm, to: " + str(self.y_printing_end_pos) + "mm")
 
+            #Set Y at starting and end position
+            if (self.printing_direction == -1):
+                self.y_printing_start_pos = self.sweep_y_max * self.pixel_to_pos_multiplier
+                self.y_printing_start_pos += self.y_start_pos - self.y_acceleration_distance
+                self.y_printing_end_pos = self.sweep_y_min * self.pixel_to_pos_multiplier
+                self.y_printing_end_pos += self.y_start_pos + self.y_acceleration_distance
+                print("Sweep ranges from: " + str(self.y_printing_start_pos) + "mm, to: " + str(self.y_printing_end_pos) + "mm")
+
             #set X position
             self.x_printing_pos = self.sweep_x_min_pos * self.pixel_to_pos_multiplier
             self.x_printing_pos += self.x_start_pos
             #check if connected before sending
-               
- 
+
+
             #fill local print buffer with lines
             print("Filling local buffer with inkjet")
             temp_line_history = ""
@@ -674,25 +696,55 @@ class MainWindow(QtWidgets.QMainWindow):
                 self.inkjet_line_buffer.append("SBR " + str(temp_b64_pos) + " " + str(temp_line_string))
                 self.inkjet_lines_left += 1
 
-            for w in range(self.sweep_y_min,self.sweep_y_max):
-                #print("Parsing line: " + str(w))
-                temp_line_changed = 0 #reset changed
-                temp_counter = 0
-                for h in range(self.sweep_x_min_pos, self.sweep_x_max_pos):
-                    #loop through all pixels to make a new burst
-                    temp_line_array[temp_counter] = self.imageconverter.image_array[h][w] #write array value to temp
+            if (self.printing_direction == -1):
+                temp_pos = ((self.sweep_y_max - 1) * self.pixel_to_pos_multiplier) + self.y_start_pos
+                temp_pos *= 1000 #printhead pos is in microns
+                temp_b64_pos = B64.B64ToSingle(temp_pos) #make position value
+                self.inkjet_line_buffer.append("SBR " + str(temp_b64_pos) + " " + str(temp_line_string))
+                self.inkjet_lines_left += 1
 
-                    temp_counter += 1
-                temp_line_string = B64.B64ToArray(temp_line_array) #convert to string
-                if (temp_line_string != temp_line_history):
-                    #print("line changed on pos: " + str(w))
-                    temp_line_history = temp_line_string
-                    #add line to buffer
-                    temp_pos = (w * self.pixel_to_pos_multiplier) + self.y_start_pos
-                    temp_pos *= 1000 #printhead pos is in microns
-                    temp_b64_pos = B64.B64ToSingle(temp_pos) #make position value
-                    self.inkjet_line_buffer.append("SBR " + str(temp_b64_pos) + " " + str(temp_line_string))
-                    self.inkjet_lines_left += 1
+            if self.printing_direction == 1:
+                for w in range(self.sweep_y_min,self.sweep_y_max):
+                    #print("Parsing line: " + str(w))
+                    temp_line_changed = 0 #reset changed
+                    temp_counter = 0
+                    for h in range(self.sweep_x_min_pos, self.sweep_x_max_pos):
+                        #loop through all pixels to make a new burst
+                        temp_line_array[temp_counter] = self.imageconverter.image_array[h][w] #write array value to temp
+
+                        temp_counter += 1
+                    temp_line_string = B64.B64ToArray(temp_line_array) #convert to string
+                    if (temp_line_string != temp_line_history):
+                        #print("line changed on pos: " + str(w))
+                        temp_line_history = temp_line_string
+                        #add line to buffer
+                        temp_pos = (w * self.pixel_to_pos_multiplier) + self.y_start_pos
+                        temp_pos *= 1000 #printhead pos is in microns
+                        temp_b64_pos = B64.B64ToSingle(temp_pos) #make position value
+                        self.inkjet_line_buffer.append("SBR " + str(temp_b64_pos) + " " + str(temp_line_string))
+                        self.inkjet_lines_left += 1
+
+            if self.printing_direction == -1:
+                for w in range(self.sweep_y_max,self.sweep_y_min):
+                    #print("Parsing line: " + str(w))
+                    temp_line_changed = 0 #reset changed
+                    temp_counter = 0
+                    for h in range(self.sweep_x_max_pos, self.sweep_x_min_pos):
+                        #loop through all pixels to make a new burst
+                        temp_line_array[temp_counter] = self.imageconverter.image_array[h][w] #write array value to temp
+
+                        temp_counter += 1
+                    temp_line_string = B64.B64ToArray(temp_line_array) #convert to string
+                    if (temp_line_string != temp_line_history):
+                        #print("line changed on pos: " + str(w))
+                        temp_line_history = temp_line_string
+                        #add line to buffer
+                        temp_pos = (w * self.pixel_to_pos_multiplier) + self.y_start_pos
+                        temp_pos *= 1000 #printhead pos is in microns
+                        temp_b64_pos = B64.B64ToSingle(temp_pos) #make position value
+                        self.inkjet_line_buffer.append("SBR " + str(temp_b64_pos) + " " + str(temp_line_string))
+                        self.inkjet_lines_left += 1
+
 
             #add all off cap at the end of the image
             temp_line_array = zeros(self.sweep_size)
@@ -703,6 +755,14 @@ class MainWindow(QtWidgets.QMainWindow):
                 temp_b64_pos = B64.B64ToSingle(temp_pos) #make position value
                 self.inkjet_line_buffer.append("SBR " + str(temp_b64_pos) + " " + str(temp_line_string))
                 self.inkjet_lines_left += 1
+
+            if (self.printing_direction == -1):
+                temp_pos = ((self.sweep_y_min + 1) * self.pixel_to_pos_multiplier) + self.y_start_pos
+                temp_pos *= 1000 #printhead pos is in microns
+                temp_b64_pos = B64.B64ToSingle(temp_pos) #make position value
+                self.inkjet_line_buffer.append("SBR " + str(temp_b64_pos) + " " + str(temp_line_string))
+                self.inkjet_lines_left += 1
+
 
             print("Making printing buffer done: ")
 
@@ -746,7 +806,8 @@ class MainWindow(QtWidgets.QMainWindow):
                     break #break if exit conditions met
 
             self.sweep_x_min_pos += self.sweep_size
-        
+            self.printing_direction *= -1
+
         print("Printing done")
         self.print_right_side *= -1
         self.grbl.SerialGotoXY(5, 433, '20000')
@@ -756,5 +817,3 @@ if __name__ == '__main__':
     app = QtWidgets.QApplication(sys.argv)
     gui = MainWindow()
     sys.exit(app.exec_())
-
-
