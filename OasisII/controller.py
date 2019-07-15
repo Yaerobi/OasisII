@@ -725,11 +725,11 @@ class MainWindow(QtWidgets.QMainWindow):
                         self.inkjet_lines_left += 1
 
             if self.printing_direction == -1:
-                for w in range(self.sweep_y_max,self.sweep_y_min):
+                for w in reversed(range(self.sweep_y_min,self.sweep_y_max)):
                     #print("Parsing line: " + str(w))
                     temp_line_changed = 0 #reset changed
                     temp_counter = 0
-                    for h in range(self.sweep_x_max_pos, self.sweep_x_min_pos):
+                    for h in reversed(range(self.sweep_x_min_pos, self.sweep_x_max_pos)):
                         #loop through all pixels to make a new burst
                         temp_line_array[temp_counter] = self.imageconverter.image_array[h][w] #write array value to temp
 
