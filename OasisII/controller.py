@@ -806,7 +806,7 @@ class MainWindow(QtWidgets.QMainWindow):
                     break #break if exit conditions met
 
             self.sweep_x_min_pos += self.sweep_size
-            self.printing_direction *= -1
+            # self.printing_direction *= -1
 
         print("Printing done")
         self.print_right_side *= -1
