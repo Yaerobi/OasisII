@@ -3,7 +3,7 @@ Cython==0.29.10
 distro==1.4.0
 future==0.17.1
 macholib==1.11
-numpy==1.16.3
+numpy==1.22.0
 pandas==0.24.2
 pdf2image==1.5.4
 pefile==2019.4.18
